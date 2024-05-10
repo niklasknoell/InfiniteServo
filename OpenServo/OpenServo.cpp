@@ -1,6 +1,6 @@
+#include "config.h"
 #include <inttypes.h>
-#include <avr/interrupt.h>
-#include <avr/io.h>
+#include <Arduino.h>
 
 #include "pwm.h"
 #include "pid.h"
@@ -10,15 +10,25 @@
 #include "enc.h"
 #include "storage.h"
 
-#define EEPROM_VERSION 1
-
 int16_t pwm;
-int16_t position;
+int32_t position;
+
+/* Position definition:
+    0 + startupAngle/360 * 2^15 is startup value
+    then counts in pos/neg direction with 2^15 steps per rev
+*/
+
+
+int main() {
+    setup();
+    while (true) {
+        loop();
+    }
+}
 
 void setup() {
-    if(eeprom_read_byte(0) !=  EEPROM_VERSION){
-        storage_registers_defaults();
-        eeprom_write_byte(0, EEPROM_VERSION);
+    if(!eeprom_initialized()){
+        eeprom_flush();
     }
     pwm_init();
     storage_init();
@@ -35,7 +45,7 @@ void loop() {
     pulse_control_update();
   
     // Get the new position value.
-    position = (int16_t) enc_get_position_value(); //0.2048..4096.y for x.0°..360°.y
+    position = enc_get_position_value(); 
   
     // Call the PID algorithm module to get a new PWM value.
     pwm = pid_position_to_pwm(position);

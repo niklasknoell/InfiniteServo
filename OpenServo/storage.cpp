@@ -20,38 +20,54 @@
 #include <inttypes.h>
 #include <avr/eeprom.h>
 
-#define MIN_INDEX 0x100
-#define MAX_INDEX 0x200
-uint16_t index;
-uint16_t reg_stor_value;
+// byte 0 is 69 to show that we have initialized eeprom
+// bytes 1 to End are data
 
-void storage_registers_defaults(void){
-    //initialize all registers
-    for(int i=MIN_INDEX; i<MAX_INDEX; i++){
-        if(eeprom_read_byte(i)!=0){
-            eeprom_update_byte(i, 0);
+#define MIN_INDEX 1
+#define MAX_INDEX (E2END-1) // Atmega328P has 1024 bytes of eeprom
+uint16_t index;
+uint16_t eeprom_saved_pos;
+
+
+
+int eeprom_initialized() {
+    return (eeprom_read_byte(0) == 69);
+}
+
+// basically flushes all of eeprom between min and max indices to 0 if not already set to 0
+void eeprom_flush(void){
+    //initialize all fully accessible words
+    uint16_t totalNumWords = (MAX_INDEX>>1) - MIN_INDEX;
+    for(uint16_t i=0; i < totalNumWords; i++){
+        if(eeprom_read_word((uint16_t *) (MIN_INDEX + (i<<1)))!=0){
+            eeprom_update_word((uint16_t *) (MIN_INDEX + (i<<1)), 0);
         }
     }
+
+    eeprom_write_byte(0, 69); // indicate we've been around and initialized the eeprom
     //write good first value to register, should only happen once in lifetime of servo
-    eeprom_write_byte(MIN_INDEX, 32);
+    eeprom_write_word((uint16_t *) MIN_INDEX, 32);
 }
 
 void storage_init(void){
     index = MIN_INDEX;
     //find index find first non empty value
-    while(eeprom_read_byte(index)==0){
+    while(eeprom_read_word((uint16_t *)index)==0){
         index++;
     }
     
-    reg_stor_value = eeprom_read_byte(index);
+    eeprom_saved_pos = eeprom_read_word((uint16_t *)index);
 }
 
-void storage_update(uint16_t position){
-    position >>= 6;
-    if(position < reg_stor_value-1 || position > reg_stor_value+1 ){
-        eeprom_write_byte(index++, 0);
+void storage_update(int32_t position){
+
+    int16_t store_pos = position >> 7;
+
+    if(store_pos < eeprom_saved_pos-2 || store_pos > eeprom_saved_pos+2 ){
+        eeprom_update_word((uint16_t *) index, 0);
+        index += 2;
         if(index>=MAX_INDEX)index=MIN_INDEX;
-        eeprom_write_byte(index, (uint8_t) position);
-        reg_stor_value = position;
+        eeprom_update_word((uint16_t *) index, (uint16_t) store_pos);        
+        eeprom_saved_pos = store_pos;
     }
 }

@@ -27,11 +27,10 @@
 #ifndef _OS_PWM_H_
 #define _OS_PWM_H_
 
-#define MIN_POSITION            1711
-#define MAX_POSITION            4710
+#include "config.h"
 
 void pwm_init(void);
-void pwm_update(uint16_t position, int16_t pwm);
+void pwm_update(uint32_t position, int16_t pwm);
 void pwm_stop(void);
 void pwm_enable(void);
 void pwm_disable(void);

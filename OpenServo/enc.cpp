@@ -23,42 +23,46 @@
 #include "swspi.h"
 #include "storage.h"
 
-uint16_t offset;
+int32_t offset;
+uint16_t angle;
+int16_t revs;
 
-struct serial_interface_unit_s
-{
-    uint16_t angle;
-    uint16_t revol;
-};
 
-static bool _reg_read_serial_interface_unit(struct serial_interface_unit_s * siu)
+static bool _reg_read_serial_interface_unit()
 {
-    uint16_t data;
+    
 
     swspi_save();
     //bool valid = swspi_read(0x8021, &data);
-    bool valid = swspi_read(0x8421, &data);
-    siu->angle = data & 0x7fff; //max 32768
-    valid &= swspi_read(0x8441, &data);
-    siu->revol = data & 0x01ff; //max 512 -> -256 - 255
-
-    return valid;
+    if (swspi_read(0x8421, &angle) & swspi_read(0x8221, &revs)) {
+        angle = angle & 0x7fff; // MSB is just new data indicator
+        revs = (revs & 0x01ff);
+        return 1;
+    }
+    else{
+        return 0;
+    }
 }
 
 void enc_init(void){
     //measure position without offset
     offset = 0<<11;
-    uint16_t position = enc_get_position_value();
-    position >>= 6;
+    uint32_t position = enc_get_position_value(); // this should be in first rev, so 0...32768
     //check current position against previous position and calculate offset
-    uint16_t prev_position = reg_stor_value;
-    offset = ((prev_position+16-position)/32)<<11;
+    // eeprom has saved previous session, so if pos is at 0.5 revs but eeprom is at 3.5 offset will be 3
+    offset = ((eeprom_saved_pos<<7)-position);
 }
 
-uint16_t enc_get_position_value(void) // (Revol+1)*2048+angle/16 -> 0.2048..4096.y for x.0°..360°.y
+
+
+int32_t enc_get_position_value(void) //
 {
-    struct serial_interface_unit_s siu;
-    uint16_t ret = offset;
-    ret += _reg_read_serial_interface_unit(&siu) ? (((siu.revol)<<11)|((siu.angle>>4)&0x1fff)) : 0xFFFF-ret;
+    int32_t ret = offset;
+    if (_reg_read_serial_interface_unit()) {
+        ret += 32768 * revs + angle; 
+    }
+    else { 
+        ret = 0xFFFFFFFF;
+    }
     return ret;
 }

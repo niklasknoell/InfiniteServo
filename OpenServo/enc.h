@@ -25,7 +25,7 @@
 
 void enc_init(void);
 /// Return the encoder position value.
-uint16_t enc_get_position_value(void);
+int32_t enc_get_position_value(void);
 
 
 #endif

@@ -20,10 +20,11 @@
 #ifndef __STORAGE_H__
 #define __STORAGE_H__
 
-void storage_registers_defaults(void);
+int eeprom_initialized();
+void eeprom_flush(void);
 void storage_init(void);
-void storage_update(uint16_t position);
+void storage_update(int32_t position);
 
-extern uint16_t reg_stor_value;
+extern uint16_t eeprom_saved_pos;
 
 #endif

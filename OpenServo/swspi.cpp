@@ -51,43 +51,43 @@
 #define _MOSI_BIT  (1<<3)
 
 
-static void _MOSI_low(void)
+static void _MOSI_low()
 {
     _MOSI_PORTx &= ~_MOSI_BIT;
 }
 
-static void _MOSI_high(void)
+static void _MOSI_high()
 {
     _MOSI_PORTx |= _MOSI_BIT;
 }
 
-static bool _MISO_read(void)
+static bool _MISO_read()
 {
     return _MISO_PINx & _MISO_BIT ? true : false;
 }
 
-static void _SCL_low(void){
+static void _SCL_low(){
     _SCL_PORTx &= ~_SCL_BIT;
 }
 
-static void _SCL_high(void){
+static void _SCL_high(){
     _SCL_PORTx |= _SCL_BIT;
 }
 
-static void _SS_low(void){
+static void _SS_low(){
    _SS_PORTx &= ~_SS_BIT;
 }
 
-static void _SS_high(void){
+static void _SS_high(){
     _SS_PORTx |= _SS_BIT;
 }
 
-static void _start(void)
+static void _start()
 {
     _SS_low();
 }
 
-static void _stop(void)
+static void _stop()
 {
     _SS_high();
 }
@@ -217,7 +217,7 @@ void swspi_save(void)
 
 uint8_t swspi_read(uint16_t addr, void * data)
 {
-    uint16_t * ptr = data;
+    uint16_t * ptr = (uint16_t *) data;
     uint8_t count = 0;
 
 #if CRCCHECK
@@ -234,6 +234,7 @@ uint8_t swspi_read(uint16_t addr, void * data)
     UPD [10] Update-Register Access 0:Acces current values 1: access to values in update buffer
     ADDR [9..4] 6-bit address
     ND [3..0] 4-bit number of data words (if bit set to 0000 no safety word is provided) (reads x registery recursively)
+
 
     AVAL (02H) ANG_VAL[14:0] angle value
     ASPD (03H) ANG_SPD[14:0] angle speed

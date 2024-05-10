@@ -11,9 +11,9 @@
 #include "pwm.h"
 #include "pulsectl.h"
 
-double kp=5;          // * (P)roportional Tuning Parameter
-double ki=0.001;     // * (I)ntegral Tuning Parameter
-double kd=5;        // * (D)erivative Tuning Parameter
+double kp=5/16;          // * (P)roportional Tuning Parameter
+double ki=0.001/16;     // * (I)ntegral Tuning Parameter
+double kd=8/16;        // * (D)erivative Tuning Parameter
 
 double outputSum, lastInput;
 
@@ -26,7 +26,7 @@ bool pOnE = true;
  *  from manual to automatic mode.
  ******************************************************************************/
 
-void pid_init(int16_t position){
+void pid_init(int32_t position){
     outputSum = 0;
     lastInput = position;
 }
@@ -38,9 +38,9 @@ void pid_init(int16_t position){
  *   false when nothing has been done.
  **********************************************************************************/
 
-int16_t pid_position_to_pwm(int16_t position){
+int16_t pid_position_to_pwm(int32_t position){
     // Disable movement when angle measurement crc failed
-    if (position == 0xFFFF){
+    if (position == 0xFFFFFFFF){
         return 0;
     }
   

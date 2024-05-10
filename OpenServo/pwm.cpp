@@ -177,7 +177,7 @@ void pwm_init(void)
 }
 
 
-void pwm_update(uint16_t position, int16_t pwm)
+void pwm_update(uint32_t position, int16_t pwm)
 // Update the PWM signal being sent to the motor.  The PWM value should be
 // a signed integer in the range of -255 to -1 for clockwise movement,
 // 1 to 255 for counter-clockwise movement or zero to stop all movement.
