@@ -3,3 +3,9 @@
 *.hex
 *.elf
 *.lst
+*.zip
+
+
+Hardware/9gServo/__Previews/**
+Hardware/9gServo/Project Logs for 9gServo/**
+Hardware/9gServo/Project Outputs for 9gServo/**

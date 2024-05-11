@@ -17,7 +17,7 @@ FILES = OpenServo.cpp enc.cpp pid.cpp pulsectl.cpp pwm.cpp storage.cpp swspi.cpp
 
 NAME = "Servo"
 
-INC = -I C:\Users\Niklas\AppData\Local\Arduino15\packages\arduino\hardware\avr\1.8.6\cores\arduino -I C:\Users\Niklas\AppData\Local\Arduino15\packages\arduino\hardware\avr\1.8.6\variants\standard
+INC = -I C:\Users\Niklas\AppData\Local\Arduino15\packages\arduino\hardware\avr\1.8.6\libraries\SoftwareSerial\src -I C:\Users\Niklas\AppData\Local\Arduino15\packages\arduino\hardware\avr\1.8.6\cores\arduino -I C:\Users\Niklas\AppData\Local\Arduino15\packages\arduino\hardware\avr\1.8.6\variants\standard
 
 DEF = -DF_CPU=16000000
 
